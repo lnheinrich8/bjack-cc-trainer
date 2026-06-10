@@ -4,8 +4,8 @@
 
 const NAV_ITEMS = [
   { id: "train", label: "Train", enabled: true },
+  { id: "play", label: "Play", enabled: true },
   { id: "stats", label: "Stats", enabled: true },
-  { id: "blackjack", label: "Blackjack", enabled: false },
   { id: "coach", label: "Coach", enabled: false },
   { id: "settings", label: "Settings", enabled: false },
 ];

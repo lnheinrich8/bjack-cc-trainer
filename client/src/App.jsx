@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Trainer from "./features/trainer/Trainer";
+import Play from "./features/play/Play";
 import Stats from "./features/stats/Stats";
 import TopNav from "./features/shared/components/TopNav";
 import { useLocalStorage } from "./features/shared/hooks/useLocalStorage";
@@ -48,6 +49,7 @@ function App() {
 
       <main className="site__main">
         {section === "train" && <Trainer onResult={recordResult} />}
+        {section === "play" && <Play />}
         {section === "stats" && <Stats stats={stats} onReset={resetStats} />}
       </main>
     </div>

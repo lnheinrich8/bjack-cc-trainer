@@ -19,3 +19,8 @@ export const startDrill = (config) =>
 // response: { guessedCount, correctCount, correct }
 export const gradeGuess = (sequence, guessedCount) =>
   api.post("/drills/grade", { sequence, guessedCount }).then((r) => r.data);
+
+// POST /api/play/shoe — deal a full, freshly shuffled shoe for a blackjack game.
+// body: { numDecks }  ->  response: { sequence: [{ rank, suit }] } (52 * numDecks)
+export const getShoe = (numDecks) =>
+  api.post("/play/shoe", { numDecks }).then((r) => r.data);
