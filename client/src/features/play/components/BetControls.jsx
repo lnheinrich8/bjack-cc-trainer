@@ -48,6 +48,10 @@ function BetControls({ bet, bankroll, onAddChip, nudge = 0 }) {
                 , then press <strong>Spacebar</strong> to deal. Click a stack to remove a
                 chip.
             </p>
+
+            <p className="belt__keys">
+                Press <strong>R</strong> to reshuffle and refill the shoe.
+            </p>
         </div>
     );
 }

@@ -127,6 +127,16 @@ function Play() {
                 return;
             }
 
+            // R reshuffles the shoe during betting — bankroll and bet are untouched.
+            if ((e.key === "r" || e.key === "R") && state.phase === "betting") {
+                e.preventDefault();
+                (async () => {
+                    const data = await getShoe(DECKS);
+                    dispatch({ type: "RESHUFFLE", shoe: data.sequence });
+                })();
+                return;
+            }
+
             // Chip hotkeys (betting only): 1-4 add a chip, Shift+1-4 remove one;
             // 5 bets the whole bankroll (all in), Shift+5 clears the table.
             if (state.phase === "betting") {

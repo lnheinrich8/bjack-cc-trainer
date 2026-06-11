@@ -662,17 +662,14 @@ h3,
   z-index: 10;
   list-style: none;
   margin: 0.5rem 0 0;
-  padding: 0.6rem 0.8rem;
+  padding: 0;
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
   text-align: right;
-  color: var(--muted);
+  color: rgba(255, 255, 255, 0.82);
   font-size: 0.9rem;
-  background: var(--panel);
-  border: 1px solid var(--panel-2);
-  border-radius: 8px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  background: transparent;
   white-space: nowrap;
 }
 
@@ -1028,6 +1025,13 @@ h3,
   align-items: center;
   gap: 0.9rem;
   margin-top: 1rem;
+}
+
+/* The two instruction lines should sit 0.75rem apart to match the Train page's
+   count prompt. .bet's 0.9rem flex gap already separates them, so pull the
+   second line up by the difference to land on exactly 0.75rem. */
+.bet .belt__keys + .belt__keys {
+  margin-top: calc(0.75rem - 0.9rem);
 }
 
 /* Chips stay centered; the running bet floats to their right (absolutely

@@ -94,7 +94,7 @@ function ConfigModal({
         <div className="modal" onClick={onClose}>
             <div className="modal__panel" onClick={(e) => e.stopPropagation()}>
                 <div className="modal__header">
-                    <h2>Configure drill</h2>
+                    <h2>Configure counting drill</h2>
                     <button className="modal__close" onClick={onClose} aria-label="Close">
                         ✕
                     </button>
