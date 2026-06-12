@@ -52,11 +52,11 @@ function chipsFor(amount) {
 //   lastNet,           // net chips from the last settled round (for the banner)
 // }
 
-export function init({ bankroll = STARTING_BANKROLL, shoe = [] } = {}) {
+export function init({ bankroll = STARTING_BANKROLL, shoe = [], pos = 0 } = {}) {
     return {
         phase: "betting",
         shoe,
-        pos: 0,
+        pos,
         bankroll,
         bet: 0,
         betChips: [], // chip values placed for the current bet, for the table display

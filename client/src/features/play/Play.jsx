@@ -1,6 +1,7 @@
 import { useEffect, useReducer, useState } from "react";
 import { getShoe } from "../../api/client";
 import { useLocalStorage } from "../shared/hooks/useLocalStorage";
+import { readShoe, writeShoe } from "../shared/utils/shoeCache";
 import {
     reducer,
     init,
@@ -39,28 +40,33 @@ function Play() {
         "bjack.play.bankroll",
         STARTING_BANKROLL,
     );
-    const [state, dispatch] = useReducer(
-        reducer,
-        { bankroll: savedBankroll, shoe: [] },
-        init,
-    );
+    const [state, dispatch] = useReducer(reducer, savedBankroll, (bankroll) => {
+        // Resume the in-progress shoe if it's still ours. Starting a Train drill
+        // claims the shared cache as "train", which makes this restore a no-op.
+        const restored = readShoe("play");
+        return init({
+            bankroll,
+            shoe: restored ? restored.sequence : [],
+            pos: restored ? restored.pos : 0,
+        });
+    });
 
     // Persist the bankroll whenever it changes so progress survives a reload.
     useEffect(() => {
         setSavedBankroll(state.bankroll);
     }, [state.bankroll, setSavedBankroll]);
 
-    // Initial shoe.
+    // Persist the live shoe to the cache shared with the Train page, tagged as
+    // ours, so navigating away and back keeps the same cards and position.
     useEffect(() => {
-        let cancelled = false;
-        (async () => {
-            const data = await getShoe(DECKS);
-            if (!cancelled) dispatch({ type: "RESHUFFLE", shoe: data.sequence });
-        })();
-        return () => {
-            cancelled = true;
-        };
-    }, []);
+        if (state.shoe.length === 0) return;
+        writeShoe("play", state.shoe, state.pos);
+    }, [state.shoe, state.pos]);
+
+    // The shoe starts empty and is fetched lazily when the player starts their
+    // first hand (see the Spacebar handler) — mirroring the Train page, which only
+    // loads a shoe once the drill begins. After that the cut-card effect below
+    // keeps it topped up.
 
     // Reshuffle between rounds once the shoe passes the cut card. Fetching resets
     // pos to 0, so needsReshuffle goes false and this won't loop.
@@ -118,8 +124,18 @@ function Play() {
             if (e.key === " ") {
                 if (state.phase === "betting") {
                     e.preventDefault(); // stop the page from scrolling on space
-                    if (state.bet > 0 && !dealDisabled) dispatch({ type: "DEAL" });
-                    else if (state.bet === 0) setNudge((n) => n + 1);
+                    if (state.bet === 0) {
+                        setNudge((n) => n + 1);
+                    } else if (shoeLoading) {
+                        // First hand: fetch the shoe, then deal once it's loaded.
+                        (async () => {
+                            const data = await getShoe(DECKS);
+                            dispatch({ type: "RESHUFFLE", shoe: data.sequence });
+                            dispatch({ type: "DEAL" });
+                        })();
+                    } else if (!dealDisabled) {
+                        dispatch({ type: "DEAL" });
+                    }
                 } else if (state.phase === "settle") {
                     e.preventDefault();
                     dispatch({ type: "NEXT_ROUND" });
@@ -187,7 +203,7 @@ function Play() {
         };
         window.addEventListener("keydown", onKey);
         return () => window.removeEventListener("keydown", onKey);
-    }, [state, dealDisabled, modalOpen]);
+    }, [state, dealDisabled, shoeLoading, modalOpen]);
 
     // Clear the blocker message 3 seconds after it (re)appears.
     useEffect(() => {

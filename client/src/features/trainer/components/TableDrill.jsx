@@ -1,6 +1,7 @@
 import { useEffect, useReducer, useRef, useState } from "react";
 import { startDrill, gradeGuess } from "../../../api/client";
 import BlackjackTable from "../../shared/components/BlackjackTable";
+import { writeShoe } from "../../shared/utils/shoeCache";
 import CountPrompt from "./CountPrompt";
 import FeedbackBanner from "./FeedbackBanner";
 
@@ -159,6 +160,14 @@ function TableDrill({ controller, onConfigChange, onResult }) {
     useEffect(() => {
         onConfigChange?.(state.config);
     }, [state.config, onConfigChange]);
+
+    // Claim the shared shoe cache for the trainer whenever a shoe loads or
+    // reshuffles. TableDrill only mounts once a drill has started, so this is the
+    // "started Train" signal that invalidates the Play page's saved shoe.
+    useEffect(() => {
+        if (state.shoe.length === 0) return;
+        writeShoe("train", state.shoe, state.pos);
+    }, [state.shoe, state.pos]);
 
     // Initial shoe — fetch the whole shoe for the starting deck count.
     useEffect(() => {
